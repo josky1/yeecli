@@ -329,6 +329,31 @@ def sunrise(duration):
     flow = yeelight.Flow(count=1, action=yeelight.flow.Action.stay, transitions=transitions)
     for bulb in BULBS:
         bulb.start_flow(flow)
+        
+@preset.command()
+@click.option(
+    "-d",
+    "--duration",
+    metavar='DURATION',
+    type=click.IntRange(50, 24 * 60 * 60),
+    default=5 * 60,
+    help="The number of seconds until the bulb reaches full color."
+)
+
+def sundown(duration):
+    """Simulate sunrise in seconds (default 5min)."""
+    click.echo("Good night!")
+    # We're using seconds for duration because it's a more natural timescale
+    # for this preset.
+    duration = duration * 1000
+    transitions = [
+        tr.TemperatureTransition(5000, duration=50, brightness=100),
+        tr.TemperatureTransition(2100, duration=duration / 2, brightness=50),
+        tr.TemperatureTransition(1700, duration=duration / 2, brightness=1),
+    ]
+    flow = yeelight.Flow(count=1, action=yeelight.flow.Action.stay, transitions=transitions)
+    for bulb in BULBS:
+        bulb.start_flow(flow)
 
 
 @preset.command()
